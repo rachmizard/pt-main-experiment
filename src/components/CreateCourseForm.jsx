@@ -1,5 +1,5 @@
 import { FormikProvider, useFormik } from "formik";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   Button,
   Card,
@@ -34,9 +34,11 @@ const initialValues = {
   ],
 };
 
-const FileUploader = () => {
+const CreateCourseForm = () => {
   const { handleCreateCourse, loading, error } = useCourse();
   const { auth } = useAuth();
+
+  const formRef = useRef(null);
 
   const form = useFormik({
     initialValues,
@@ -46,8 +48,9 @@ const FileUploader = () => {
         await handleCreateCourse(values);
 
         form.resetForm();
+        formRef.current?.reset();
       } catch (error) {
-        alert(error.message);
+        setIsError(true);
       }
     },
   });
@@ -64,7 +67,7 @@ const FileUploader = () => {
               <Card.Header>Create Course</Card.Header>
               <Card.Body>
                 <FormikProvider value={form}>
-                  <Form onSubmit={form.handleSubmit}>
+                  <Form ref={formRef} onSubmit={form.handleSubmit}>
                     <InputGroup
                       controlId="courseTitle"
                       name="courseTitle"
@@ -148,4 +151,4 @@ const FileUploader = () => {
   );
 };
 
-export default FileUploader;
+export default CreateCourseForm;

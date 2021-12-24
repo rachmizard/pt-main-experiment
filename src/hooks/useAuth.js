@@ -1,20 +1,13 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { AuthContext } from "src/context/AuthContext";
 import { AuthService } from "src/services/auth.service";
 
-const authService = new AuthService();
-
 export default function useAuth() {
+  const authService = new AuthService();
+
   const auth = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const overrideAuth = JSON.parse(localStorage.getItem("__auth__"));
-    if (overrideAuth) {
-      auth.setAuth(overrideAuth);
-    }
-  }, []);
 
   const login = async ({ email = "", password = "" }) => {
     try {
@@ -32,6 +25,17 @@ export default function useAuth() {
     }
   };
 
+  const flushSyncProfile = async () => {
+    try {
+      const { data } = await authService.getProfile();
+
+      auth.setAuth({ ...auth.auth, user: data.data });
+    } catch (error) {
+      setError(error.message);
+      throw new Error(error);
+    }
+  };
+
   const logout = () => {
     localStorage.clear();
     auth.setAuth(null);
@@ -43,5 +47,6 @@ export default function useAuth() {
     loading,
     error,
     auth,
+    flushSyncProfile,
   };
 }

@@ -22,7 +22,6 @@ export default class AxiosAdapterService {
         if (error.response) {
           if (error.response.status === 401) {
             localStorage.clear();
-            window.location.reload();
             throw new Error("Expired Authentication");
           }
         }

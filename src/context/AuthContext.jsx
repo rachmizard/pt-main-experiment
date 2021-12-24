@@ -3,7 +3,8 @@ import React, { createContext, useState } from "react";
 export const AuthContext = createContext(null);
 
 const AuthProvider = ({ children }) => {
-  const [auth, setAuth] = useState(null);
+  const overrideAuth = JSON.parse(localStorage.getItem("__auth__"));
+  const [auth, setAuth] = useState(overrideAuth || null);
 
   return (
     <AuthContext.Provider value={{ auth, setAuth }}>
