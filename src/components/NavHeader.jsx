@@ -1,12 +1,13 @@
-import React, { useState } from "react";
-import { Container, Navbar, ToastContainer, Toast } from "react-bootstrap";
+import React from "react";
+import { Container, Navbar } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import useAuth from "src/hooks/useAuth";
+import usePopup from "src/hooks/usePopup";
 
 const NavHeader = ({ children }) => {
   const { auth, logout, flushSyncProfile } = useAuth();
+  const [showPopup] = usePopup();
   const navigate = useNavigate();
-  const [error, setError] = useState(null);
 
   const handleLogout = () => {
     logout();
@@ -17,8 +18,18 @@ const NavHeader = ({ children }) => {
   const handleRefreshAuth = async () => {
     try {
       await flushSyncProfile();
+
+      showPopup({
+        show: true,
+        bg: "success",
+        message: "Berhasil update profile",
+      });
     } catch (error) {
-      setError(error.message);
+      showPopup({
+        show: true,
+        bg: "warning",
+        message: error.message,
+      });
     }
   };
 
@@ -51,28 +62,6 @@ const NavHeader = ({ children }) => {
           )}
         </Container>
       </Navbar>
-
-      <ToastContainer position="top-center" className="p-3">
-        <Toast
-          show={!!error}
-          animation
-          autoHide
-          bg="warning"
-          onClose={() => setError(null)}
-        >
-          <Toast.Header>
-            <img
-              src="holder.js/20x20?text=%20"
-              className="rounded me-2"
-              alt=""
-            />
-            <strong className="me-auto">Alert</strong>
-          </Toast.Header>
-          <Toast.Body>
-            <p className="fw-bold text-white">{error}</p>
-          </Toast.Body>
-        </Toast>
-      </ToastContainer>
 
       {children}
     </>

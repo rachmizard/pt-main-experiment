@@ -30,6 +30,11 @@ export default function useAuth() {
       const { data } = await authService.getProfile();
 
       auth.setAuth({ ...auth.auth, user: data.data });
+
+      localStorage.setItem(
+        "__auth__",
+        JSON.stringify({ ...auth.auth, user: data.data })
+      );
     } catch (error) {
       setError(error.message);
       throw new Error(error);

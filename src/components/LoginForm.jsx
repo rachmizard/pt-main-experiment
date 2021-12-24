@@ -1,15 +1,18 @@
 import React, { useState } from "react";
-import { Form, Button, Toast, ToastContainer } from "react-bootstrap";
+import { Form, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+
 import useAuth from "src/hooks/useAuth";
+import usePopup from "src/hooks/usePopup";
 
 const LoginForm = () => {
   const { login, loading, error } = useAuth();
+  const [showPopup] = usePopup();
+
   const [form, setForm] = useState({
     email: "",
     password: "",
   });
-  const [showToast, setShowToast] = useState(false);
 
   const navigate = useNavigate();
 
@@ -24,7 +27,11 @@ const LoginForm = () => {
 
       navigate("/", { replace: true });
     } catch (err) {
-      setShowToast(true);
+      showPopup({
+        show: true,
+        bg: "warning",
+        message: error,
+      });
     }
   };
 
@@ -63,27 +70,6 @@ const LoginForm = () => {
           {!loading ? "Submit" : "Loading..."}
         </Button>
       </Form>
-      <ToastContainer position="top-center" className="p-3">
-        <Toast
-          show={showToast}
-          animation
-          autoHide
-          bg="warning"
-          onClose={() => setShowToast(false)}
-        >
-          <Toast.Header>
-            <img
-              src="holder.js/20x20?text=%20"
-              className="rounded me-2"
-              alt=""
-            />
-            <strong className="me-auto">Alert</strong>
-          </Toast.Header>
-          <Toast.Body>
-            <p className="fw-bold text-white">{error}</p>
-          </Toast.Body>
-        </Toast>
-      </ToastContainer>{" "}
     </>
   );
 };

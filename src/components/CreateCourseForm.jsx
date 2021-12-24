@@ -1,19 +1,12 @@
 import { FormikProvider, useFormik } from "formik";
 import React, { useRef, useState } from "react";
-import {
-  Button,
-  Card,
-  Container,
-  Form,
-  Spinner,
-  Toast,
-  ToastContainer,
-} from "react-bootstrap";
+import { Button, Card, Container, Form, Spinner } from "react-bootstrap";
 
 import { InputDynamicCourse, InputGroup } from "./Input";
 
 import useAuth from "src/hooks/useAuth";
 import useCourse from "src/hooks/useCourse";
+import usePopup from "src/hooks/usePopup";
 
 import { createCourseSchema } from "src/validations/course.validation";
 
@@ -36,6 +29,7 @@ const initialValues = {
 
 const CreateCourseForm = () => {
   const { handleCreateCourse, loading, error } = useCourse();
+  const [showPopup] = usePopup();
   const { auth } = useAuth();
 
   const formRef = useRef(null);
@@ -49,13 +43,22 @@ const CreateCourseForm = () => {
 
         form.resetForm();
         formRef.current?.reset();
-      } catch (error) {
-        setIsError(true);
+
+        showPopup({
+          show: true,
+          bg: "success",
+          message: "Berhasil menambahkan pelatihan baru!",
+        });
+      } catch (err) {
+        showPopup({
+          show: true,
+          bg: "warning",
+          message: error,
+        });
       }
     },
   });
 
-  const [isError, setIsError] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
   return (
@@ -123,28 +126,6 @@ const CreateCourseForm = () => {
               </Card.Body>
             </Card>
           </Container>
-
-          <ToastContainer position="top-center" className="p-3">
-            <Toast
-              show={isError || !!error}
-              animation
-              autohide
-              bg="warning"
-              onClose={() => setIsError(false)}
-            >
-              <Toast.Header>
-                <img
-                  src="holder.js/20x20?text=%20"
-                  className="rounded me-2"
-                  alt=""
-                />
-                <strong className="me-auto">Alert</strong>
-              </Toast.Header>
-              <Toast.Body>
-                <p className="text-white fw-bold text-center">{error}</p>
-              </Toast.Body>
-            </Toast>
-          </ToastContainer>
         </>
       )}
     </>

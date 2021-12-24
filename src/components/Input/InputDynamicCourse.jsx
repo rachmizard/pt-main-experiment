@@ -8,10 +8,14 @@ import InputFileGroup from "./InputFileGroup";
 
 import FileService from "src/services/file.service";
 
+import usePopup from "src/hooks/usePopup";
+
 const InputDynamicCourse = ({ name, onUpload }) => {
   const fileService = new FileService();
 
   const [input, meta, helpers] = useField(name);
+  const [showPopup] = usePopup();
+
   const [isUpload, setIsUpload] = useState(false);
   const [progressFiles, setProgressFiles] = useState([
     {
@@ -98,7 +102,11 @@ const InputDynamicCourse = ({ name, onUpload }) => {
 
         onSetUrlUpload(index, data.url);
       } catch (error) {
-        alert(error.message);
+        showPopup({
+          show: true,
+          bg: "warning",
+          message: error.message,
+        });
       } finally {
         onUpload(false);
       }
