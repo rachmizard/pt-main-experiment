@@ -10,7 +10,7 @@ import {
   ToastContainer,
 } from "react-bootstrap";
 
-import InputDynamicCourse from "./InputDynamicCourse";
+import { InputDynamicCourse, InputGroup } from "./Input";
 
 import useAuth from "src/hooks/useAuth";
 import useCourse from "src/hooks/useCourse";
@@ -65,53 +65,28 @@ const FileUploader = () => {
               <Card.Body>
                 <FormikProvider value={form}>
                   <Form onSubmit={form.handleSubmit}>
-                    <Form.Group controlId="courseTitle" className="mb-3">
-                      <Form.Control
-                        name="courseTitle"
-                        onChange={form.handleChange}
-                        isInvalid={
-                          form.touched.courseTitle && !!form.errors.courseTitle
-                        }
-                        onBlur={form.handleBlur}
-                        value={form.values.courseTitle}
-                        type="text"
-                        placeholder="Nama Pelatihan"
-                      />
-                      <Form.Control.Feedback type="invalid">
-                        {form.errors.courseTitle}
-                      </Form.Control.Feedback>
-                    </Form.Group>
-                    <Form.Group controlId="courseDesc" className="mb-3">
-                      <Form.Control
-                        as="textarea"
-                        name="courseDesc"
-                        value={form.values.courseDesc}
-                        isInvalid={
-                          form.touched.courseDesc && !!form.errors.courseDesc
-                        }
-                        onBlur={form.handleBlur}
-                        onChange={form.handleChange}
-                        type="text"
-                        placeholder="Deskripsi"
-                      />
-                      <Form.Control.Feedback type="invalid">
-                        {form.errors.courseDesc}
-                      </Form.Control.Feedback>
-                    </Form.Group>
-                    <Form.Group controlId="price" className="mb-3">
-                      <Form.Control
-                        name="price"
-                        value={form.values.price}
-                        isInvalid={!!form.errors.price}
-                        onBlur={form.haandleBlur}
-                        onChange={form.handleChange}
-                        type="number"
-                        placeholder="Harga"
-                      />
-                      <Form.Control.Feedback type="invalid">
-                        {form.errors.price}
-                      </Form.Control.Feedback>
-                    </Form.Group>
+                    <InputGroup
+                      controlId="courseTitle"
+                      name="courseTitle"
+                      label="Nama pelatihan"
+                      placeholder="Masukan nama pelatihan.."
+                    />
+
+                    <InputGroup
+                      as="textarea"
+                      controlId="courseDesc"
+                      name="courseDesc"
+                      label="Deskripsi"
+                      placeholder="Masukan nama deskripsi.."
+                    />
+
+                    <InputGroup
+                      controlId="price"
+                      name="price"
+                      label="Harga Kursus"
+                      placeholder="Masukan nama harga.."
+                      type="number"
+                    />
 
                     <InputDynamicCourse
                       name="modules"
