@@ -24,7 +24,6 @@ const InputFileGroup = ({
         isInvalid={!!meta.error && meta.touched}
         isValid={input.value && status}
         onChange={async (e) => {
-          input.onChange(e);
           await onUploadFile(fileKey, e);
         }}
         accept="video/*,image/*"

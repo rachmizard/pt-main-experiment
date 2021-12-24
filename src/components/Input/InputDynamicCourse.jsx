@@ -12,9 +12,9 @@ const InputDynamicCourse = ({ name, onUpload }) => {
   const fileService = new FileService();
 
   const [input, meta, helpers] = useField(name);
-  const [fileUrls, setFileUrls] = useState([
+  const [isUpload, setIsUpload] = useState(false);
+  const [progressFiles, setProgressFiles] = useState([
     {
-      url: null,
       progress: 0,
       isUploading: false,
       done: false,
@@ -30,50 +30,57 @@ const InputDynamicCourse = ({ name, onUpload }) => {
     };
 
     const fileUrl = {
-      url: null,
       progress: 0,
       isUploading: false,
       done: false,
     };
 
     helpers.setValue([...input.value, value], false);
-    setFileUrls((state) => [...state, fileUrl]);
+    setProgressFiles((state) => [...state, fileUrl]);
   };
 
   const removeField = (index) => {
-    const values = input.value;
+    const values = [...input.value];
 
     if (values.length > 1) {
       values.splice(index, 1);
-      fileUrls.splice(index, 1);
+      progressFiles.splice(index, 1);
 
       helpers.setValue([...values], false);
-      setFileUrls([...fileUrls]);
+      setProgressFiles([...progressFiles]);
     }
   };
 
-  const setProgressUploading = (index, data) => {
-    setFileUrls((state) => {
+  const onProgressUploading = (index, data) => {
+    setIsUpload(true);
+    setProgressFiles((state) => {
       state[index].progress = Math.round((100 * data.loaded) / data.total);
       return [...state];
     });
   };
 
-  const setUrlUpload = (index, url) => {
-    const values = input.value;
+  const onSetUrlUpload = (index, url) => {
+    const values = [...input.value];
     values[index].fileUrl = url;
 
-    helpers.setValue([...values], false);
-    setFileUrls((state) => {
-      state[index].url = url;
+    helpers.setValue([...values], true);
+
+    setProgressFiles((state) => {
+      state[index].isUploading = false;
+      state[index].done = true;
+      state[index].progress = 0;
+
       return [...state];
     });
+
+    setIsUpload(false);
   };
 
   const onUploadFile = async (index, event) => {
     if (event.target.files[0]) {
       try {
-        setFileUrls((state) => {
+        setIsUpload(true);
+        setProgressFiles((state) => {
           state[index].isUploading = true;
           return [...state];
         });
@@ -81,7 +88,7 @@ const InputDynamicCourse = ({ name, onUpload }) => {
         onUpload(true);
 
         const config = {
-          onUploadProgress: (data) => setProgressUploading(index, data),
+          onUploadProgress: (data) => onProgressUploading(index, data),
           cancelToken: fileService.cancelTokenSource.token,
         };
         const { data } = await fileService.uploadFile(
@@ -89,15 +96,10 @@ const InputDynamicCourse = ({ name, onUpload }) => {
           config
         );
 
-        setUrlUpload(index, data.url);
+        onSetUrlUpload(index, data.url);
       } catch (error) {
+        alert(error.message);
       } finally {
-        setFileUrls((state) => {
-          state[index].isUploading = false;
-          state[index].done = true;
-
-          return [...state];
-        });
         onUpload(false);
       }
     }
@@ -136,9 +138,9 @@ const InputDynamicCourse = ({ name, onUpload }) => {
                       name={`modules.${index}.fileUrl`}
                       label="File Modul"
                       onUploadFile={onUploadFile}
-                      isUploading={fileUrls[index].isUploading}
-                      progress={fileUrls[index].progress}
-                      status={fileUrls[index].done}
+                      isUploading={progressFiles[index].isUploading}
+                      progress={progressFiles[index].progress}
+                      status={progressFiles[index].done}
                     />
 
                     <InputCheckboxGroup
@@ -160,7 +162,7 @@ const InputDynamicCourse = ({ name, onUpload }) => {
 
                       <Button
                         hidden={meta.value.length === 1}
-                        disabled={fileUrls[index].isUploading}
+                        disabled={progressFiles[index].isUploading}
                         onClick={() => removeField(index)}
                         size="sm"
                         variant="danger"
@@ -176,6 +178,7 @@ const InputDynamicCourse = ({ name, onUpload }) => {
             size="sm"
             variant="warning"
             className="text-white"
+            disabled={isUpload}
             onClick={addField}
           >
             Add Field
