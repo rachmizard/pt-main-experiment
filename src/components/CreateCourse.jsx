@@ -12,35 +12,38 @@ import {
 
 import InputDynamicCourse from "./InputDynamicCourse";
 
-import CourseService from "src/services/course.service";
-
 import useAuth from "src/hooks/useAuth";
+import useCourse from "src/hooks/useCourse";
+
 import { createCourseSchema } from "src/validations/course.validation";
 
+const initialValues = {
+  courseTitle: "",
+  courseDesc: "",
+  coursePic:
+    "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.facebook.com%2Frandomimagesbr&psig=AOvVaw1f7nX8isHaOlXHP8Y_BZ_4&ust=1640384921800000&source=images&cd=vfe&ved=0CAsQjRxqFwoTCOiwrZb8-vQCFQAAAAAdAAAAABAI",
+  price: 0,
+  estHour: 8,
+  modules: [
+    {
+      fileUrl: "",
+      moduleName: "",
+      desc: "",
+      isQuiz: false,
+    },
+  ],
+};
+
 const FileUploader = () => {
-  const courseService = new CourseService();
+  const { handleCreateCourse, loading, error } = useCourse();
+  const { auth } = useAuth();
 
   const form = useFormik({
-    initialValues: {
-      courseTitle: "",
-      courseDesc: "",
-      coursePic:
-        "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.facebook.com%2Frandomimagesbr&psig=AOvVaw1f7nX8isHaOlXHP8Y_BZ_4&ust=1640384921800000&source=images&cd=vfe&ved=0CAsQjRxqFwoTCOiwrZb8-vQCFQAAAAAdAAAAABAI",
-      price: 0,
-      estHour: 8,
-      modules: [
-        {
-          fileUrl: "",
-          moduleName: "",
-          desc: "",
-          isQuiz: false,
-        },
-      ],
-    },
+    initialValues,
     validationSchema: createCourseSchema,
     onSubmit: async (values) => {
       try {
-        await courseService.createCourse(values);
+        await handleCreateCourse(values);
 
         form.resetForm();
       } catch (error) {
@@ -50,10 +53,7 @@ const FileUploader = () => {
   });
 
   const [isError, setIsError] = useState(false);
-  const [errorMsg] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
-
-  const { auth } = useAuth();
 
   return (
     <>
@@ -119,8 +119,12 @@ const FileUploader = () => {
                     />
 
                     <Form.Group>
-                      <Button size="sm" type="submit" disabled={isUploading}>
-                        {isUploading ? (
+                      <Button
+                        size="sm"
+                        type="submit"
+                        disabled={isUploading || loading}
+                      >
+                        {isUploading || loading ? (
                           <>
                             <Spinner
                               as="span"
@@ -144,7 +148,7 @@ const FileUploader = () => {
 
           <ToastContainer position="top-center" className="p-3">
             <Toast
-              show={isError}
+              show={isError || !!error}
               animation
               autohide
               bg="warning"
@@ -159,7 +163,7 @@ const FileUploader = () => {
                 <strong className="me-auto">Alert</strong>
               </Toast.Header>
               <Toast.Body>
-                <p className="text-white fw-bold text-center">{errorMsg}</p>
+                <p className="text-white fw-bold text-center">{error}</p>
               </Toast.Body>
             </Toast>
           </ToastContainer>

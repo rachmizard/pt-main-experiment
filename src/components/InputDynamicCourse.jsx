@@ -66,32 +66,35 @@ const InputDynamicCourse = ({ name, onUpload }) => {
   };
 
   const onUploadFile = async (index, event) => {
-    try {
-      setFileUrls((state) => {
-        state[index].isUploading = true;
-        return [...state];
-      });
+    if (event.target.files[0]) {
+      try {
+        setFileUrls((state) => {
+          state[index].isUploading = true;
+          return [...state];
+        });
 
-      onUpload(true);
+        onUpload(true);
 
-      const config = {
-        onUploadProgress: (data) => setProgressUploading(index, data),
-        cancelToken: fileService.cancelTokenSource.token,
-      };
-      const { data } = await fileService.uploadFile(
-        event.target.files[0],
-        config
-      );
+        const config = {
+          onUploadProgress: (data) => setProgressUploading(index, data),
+          cancelToken: fileService.cancelTokenSource.token,
+        };
+        const { data } = await fileService.uploadFile(
+          event.target.files[0],
+          config
+        );
 
-      setUrlUpload(index, data.url);
-    } catch (error) {
-    } finally {
-      setFileUrls((state) => {
-        state[index].isUploading = false;
-        state[index].done = true;
-        return [...state];
-      });
-      onUpload(false);
+        setUrlUpload(index, data.url);
+      } catch (error) {
+      } finally {
+        setFileUrls((state) => {
+          state[index].isUploading = false;
+          state[index].done = true;
+
+          return [...state];
+        });
+        onUpload(false);
+      }
     }
   };
 
@@ -105,10 +108,13 @@ const InputDynamicCourse = ({ name, onUpload }) => {
     <>
       <Row>
         <Col className="offset-md-1 my-5">
-          {meta.value.length > 0 &&
-            meta.value.map((field, index) => {
+          {input.value.length > 0 &&
+            input.value.map((field, index) => {
               return (
-                <Row key={`row-${index}`} className="align-items-start gap-2">
+                <Row
+                  key={`row-${index}`}
+                  className="align-items-start gap-2 my-5"
+                >
                   <Col lg={10}>
                     <Form.Group
                       controlId={`moduleName-${index}`}
@@ -142,19 +148,6 @@ const InputDynamicCourse = ({ name, onUpload }) => {
                       />
                       <Form.Control.Feedback type="invalid">
                         {getModuleErrors("desc", index)}
-                      </Form.Control.Feedback>
-                    </Form.Group>
-
-                    <Form.Group controlId={`isQuiz-${index}`} className="mb-3">
-                      <Form.Check
-                        name={`modules.${index}.isQuiz`}
-                        value={input.value[index].isQuiz}
-                        onChange={input.onChange}
-                        type="checkbox"
-                        label="Tambahkan Quiz"
-                      />
-                      <Form.Control.Feedback type="invalid">
-                        {getModuleErrors("isQuiz", index)}
                       </Form.Control.Feedback>
                     </Form.Group>
 
@@ -199,6 +192,19 @@ const InputDynamicCourse = ({ name, onUpload }) => {
                         />
                       </>
                     )}
+
+                    <Form.Group controlId={`isQuiz-${index}`} className="mb-3">
+                      <Form.Check
+                        name={`modules.${index}.isQuiz`}
+                        value={input.value[index].isQuiz}
+                        onChange={input.onChange}
+                        type="checkbox"
+                        label="Tambahkan Quiz"
+                      />
+                      <Form.Control.Feedback type="invalid">
+                        {getModuleErrors("isQuiz", index)}
+                      </Form.Control.Feedback>
+                    </Form.Group>
                   </Col>
                   <Col>
                     <div className="d-flex flex-row gap-2">
