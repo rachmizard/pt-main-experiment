@@ -11,6 +11,7 @@ import AuthProvider from "./context/AuthContext";
 import PopupProvider from "./context/PopupContext";
 
 import useAuth from "./hooks/useAuth";
+import CoursePage from "./pages/course";
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
             }
           >
             <Route index path="/" element={<HomePage />} />
+            <Route path="/courses" element={<CoursePage />} />
             <Route path="/courses/create" element={<CreateCoursePage />} />
           </Route>
         </Routes>

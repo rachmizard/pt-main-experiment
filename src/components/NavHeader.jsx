@@ -49,7 +49,7 @@ const NavHeader = ({ children }) => {
                 </a>
               </Navbar.Text>
               <Navbar.Text className="p-3">
-                <Link to="/courses/create">Course</Link>
+                <Link to="/courses">Course</Link>
               </Navbar.Text>
               <Navbar.Text
                 className="p-3"

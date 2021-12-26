@@ -8,6 +8,7 @@ export default function useCourse() {
     loading: false,
     success: false,
     error: null,
+    courses: {},
   });
 
   const handleCreateCourse = async (payload) => {
@@ -28,6 +29,30 @@ export default function useCourse() {
     }
   };
 
+  const queryCourse = async (params) => {
+    try {
+      setState((state) => ({ ...state, loading: true, success: false }));
+
+      const data = await courseService.getCourses(params);
+
+      setState((state) => ({ ...state, courses: data }));
+    } catch (error) {
+      setState((state) => ({
+        ...state,
+        loading: false,
+        success: false,
+        error: error.message,
+      }));
+      throw new Error(error);
+    } finally {
+      setState((state) => ({
+        ...state,
+        loading: false,
+        success: true,
+      }));
+    }
+  };
+
   const { loading, success, error } = state;
 
   return {
@@ -35,5 +60,7 @@ export default function useCourse() {
     success,
     error,
     handleCreateCourse,
+    queryCourse,
+    courses: state.courses,
   };
 }
