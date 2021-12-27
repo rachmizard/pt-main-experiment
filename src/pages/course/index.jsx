@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import Datatable from "src/components/Datatable";
@@ -30,6 +30,10 @@ const CoursePage = () => {
       showPopup({ show: true, bg: "warning", message: error.message });
     }
   };
+
+  const { page, totalPages, totalResults, results } = course.courses;
+
+  console.log(course.courses);
 
   return (
     <>
@@ -74,7 +78,12 @@ const CoursePage = () => {
             },
           },
         ]}
-        sourceData={course.courses?.results}
+        sourceData={results}
+        paginate={{
+          totalCount: totalResults,
+          siblingCount: 1,
+          currentPage: page,
+        }}
         onSubmitFilter={onSubmitFilter}
         withSearch={true}
         customPanel={

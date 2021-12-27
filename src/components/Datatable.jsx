@@ -1,6 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Button, Col, Form, Row, Spinner, Table } from "react-bootstrap";
+import {
+  Button,
+  Col,
+  Form,
+  Row,
+  Spinner,
+  Table,
+  Pagination,
+} from "react-bootstrap";
 import { FaSearch, FaSortDown, FaSortUp } from "react-icons/fa";
+import usePagination from "src/hooks/usePagination";
 import DatatableService from "src/services/datatable.service";
 
 const datatableService = new DatatableService();
@@ -13,7 +22,14 @@ const Datatable = ({
   customPanel,
   defaultQuery,
   withSearch,
+  paginate = {
+    totalCount: 0,
+    siblingCount: 1,
+    currentPage: 1,
+  },
 }) => {
+  const { totalCount, siblingCount, currentPage } = paginate;
+
   const [query, setQuery] = useState({
     page: 1,
     limit: 8,
@@ -25,10 +41,10 @@ const Datatable = ({
   }, []);
 
   useEffect(() => {
-    if (query?.sortBy || query.limit) {
+    if (query?.sortBy || query.limit || query.page) {
       onSubmitFilter(query);
     }
-  }, [query?.sortBy, query.limit]);
+  }, [query?.sortBy, query.limit, query.page]);
 
   const [sorts, setSorts] = useState([]);
 
@@ -48,10 +64,10 @@ const Datatable = ({
   };
 
   const setFilterSort = (by) => {
-    const prevSort = sorts.find((filter) => filter[by]);
-    const findIndex = sorts.indexOf(prevSort);
+    const order = sorts.find((filter) => filter[by]);
+    const findIndex = sorts.indexOf(order);
     const updateSorts = sorts;
-    updateSorts[findIndex][by] = prevSort[by] === "asc" ? "desc" : "asc";
+    updateSorts[findIndex][by] = order[by] === "asc" ? "desc" : "asc";
 
     const sortBy = datatableService.generateClauseSortFilter(updateSorts);
 
@@ -70,7 +86,11 @@ const Datatable = ({
   };
 
   const setLimitQuery = (limit) => {
-    setQuery((state) => ({ ...state, limit }));
+    setQuery((state) => ({ ...state, page: 1, limit }));
+  };
+
+  const setPageQuery = (page) => {
+    setQuery((state) => ({ ...state, page }));
   };
 
   return (
@@ -104,7 +124,7 @@ const Datatable = ({
         </Col>
         <Col className="align-self-end">{customPanel}</Col>
       </Row>
-      <Table striped bordered size="sm" hover variant="dark">
+      <Table striped bordered size="sm" hover variant="light">
         <thead>
           <tr>
             {columns.map((column, index) => {
@@ -156,7 +176,15 @@ const Datatable = ({
         </tbody>
       </Table>
       <Row>
-        <Col></Col>
+        <Col>
+          <DatatablePagination
+            totalCount={totalCount}
+            pageSize={query.limit}
+            siblingCount={siblingCount}
+            currentPage={currentPage}
+            onPageChange={(page) => setPageQuery(page)}
+          />
+        </Col>
         <Col lg={3}>
           <Form.Group
             className="d-flex flex-row justify-content-end"
@@ -209,6 +237,53 @@ const RenderRow = ({ index, columns, data, renderRecord }) => {
         );
       })}
     </tr>
+  );
+};
+
+const DatatablePagination = ({
+  size = "sm",
+  totalCount,
+  pageSize,
+  siblingCount,
+  currentPage = 1,
+  onPageChange,
+}) => {
+  const paginationRange = usePagination({
+    totalCount,
+    siblingCount,
+    currentPage,
+    pageSize,
+  });
+
+  const onNext = () => {
+    onPageChange(currentPage + 1);
+  };
+
+  const onPrevious = () => {
+    onPageChange(currentPage - 1);
+  };
+
+  let lastPage = paginationRange[paginationRange.length - 1];
+
+  return (
+    <Pagination size={size}>
+      <Pagination.Prev disabled={currentPage === 1} onClick={onPrevious} />
+      {paginationRange.map((pageNumber) => {
+        if (pageNumber === "....") {
+          return <Pagination.Ellipsis />;
+        }
+
+        return (
+          <Pagination.Item
+            active={currentPage === pageNumber}
+            onClick={() => onPageChange(pageNumber)}
+          >
+            {pageNumber}
+          </Pagination.Item>
+        );
+      })}
+      <Pagination.Next onClick={onNext} disabled={currentPage === lastPage} />
+    </Pagination>
   );
 };
 

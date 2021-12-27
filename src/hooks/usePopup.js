@@ -5,7 +5,7 @@ export default function usePopup() {
   const { stacks, setStacks } = useContext(PopupContext);
 
   const showPopup = ({
-    show = false,
+    show = true,
     animation = true,
     autohide = true,
     delay = 4000,
