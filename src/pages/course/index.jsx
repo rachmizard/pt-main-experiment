@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect } from "react";
 import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
@@ -31,7 +32,7 @@ const CoursePage = () => {
     }
   };
 
-  const { page, totalPages, totalResults, results } = course.courses;
+  const { page, totalResults, results } = course.courses;
 
   console.log(course.courses);
 
