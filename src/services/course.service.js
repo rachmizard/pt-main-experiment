@@ -18,4 +18,16 @@ export default class CourseService extends AxiosAdapterService {
       throw new Error("Gagal mengambil course:" + error.message);
     }
   }
+
+  async getCourseById(id, params = {}) {
+    try {
+      const { data } = await this.sendGetRequest(`/admin/courses/${id}`, {
+        params,
+      });
+
+      return data;
+    } catch (error) {
+      throw new Error("Gagal mengambil course:" + error.message);
+    }
+  }
 }

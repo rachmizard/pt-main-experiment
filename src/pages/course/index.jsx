@@ -34,8 +34,6 @@ const CoursePage = () => {
 
   const { page, totalResults, results } = course.courses;
 
-  console.log(course.courses);
-
   return (
     <>
       <Datatable
@@ -76,6 +74,24 @@ const CoursePage = () => {
             index: "totalUserJoin",
             render: (record, data, index) => {
               return data;
+            },
+          },
+          {
+            label: "Action",
+            index: "id",
+            render: (record, data, index) => {
+              return (
+                <div className="d-flex justify-content-center">
+                  <Button
+                    as={Link}
+                    size="sm"
+                    varian="success"
+                    to={`/courses/${data}`}
+                  >
+                    Detail Course
+                  </Button>
+                </div>
+              );
             },
           },
         ]}
