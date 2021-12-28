@@ -1,4 +1,4 @@
-import React, { createContext, useState } from "react";
+import React, { createContext, useMemo, useState } from "react";
 
 export const CartContext = createContext(null);
 
@@ -7,7 +7,9 @@ const CartProvider = ({ children }) => {
 
      const [carts, setCarts] = useState(convertJson || []);
 
-     const value = { carts, setCarts };
+     const value = useMemo(() => {
+          return { carts, setCarts };
+     }, [carts, setCarts]);
 
      return (
           <CartContext.Provider value={value}>{children}</CartContext.Provider>

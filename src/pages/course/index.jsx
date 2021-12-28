@@ -10,7 +10,7 @@ import usePopup from "src/hooks/usePopup";
 
 const CoursePage = () => {
      const course = useCourse();
-     const { carts, addCart, removeCart } = useCart();
+     const { carts, addCart, removeCart, isLoading, error } = useCart();
      const [showPopup] = usePopup();
      const defaultQuery = {
           page: 1,
@@ -36,6 +36,45 @@ const CoursePage = () => {
                await course.queryCourse(values);
           } catch (error) {
                showPopup({ show: true, bg: "warning", message: error.message });
+          }
+     };
+
+     const handleAddCart = async (record, data) => {
+          try {
+               await addCart(data);
+          } catch (err) {
+               showPopup({
+                    bg: "warning",
+                    message: error,
+               });
+          } finally {
+               showPopup({
+                    show: true,
+                    bg: "success",
+                    message: `${record.courseTitle} successfully added to your cart`,
+               });
+          }
+     };
+
+     const handleRemoveCart = async (record, data) => {
+          try {
+               const cartIsTaken = carts.find((cart) => cart === data);
+
+               if (cartIsTaken) {
+                    await removeCart(data);
+               }
+          } catch (err) {
+               showPopup({
+                    show: true,
+                    bg: "warning",
+                    message: error,
+               });
+          } finally {
+               showPopup({
+                    show: true,
+                    bg: "success",
+                    message: `${record.courseTitle} successfully removed from your cart`,
+               });
           }
      };
 
@@ -118,26 +157,19 @@ const CoursePage = () => {
                                                   }
                                                   type="button"
                                                   className="text-white"
-                                                  onClick={() => {
+                                                  disabled={isLoading}
+                                                  onClick={async () => {
                                                        if (cartIsTaken) {
-                                                            showPopup({
-                                                                 show: true,
-                                                                 bg: "success",
-                                                                 message: `${record.courseTitle} successfully removed from your cart`,
-                                                            });
-
-                                                            return removeCart(
+                                                            return await handleRemoveCart(
+                                                                 record,
                                                                  data
                                                             );
                                                        }
 
-                                                       showPopup({
-                                                            show: true,
-                                                            bg: "success",
-                                                            message: `${record.courseTitle} successfully added to your cart`,
-                                                       });
-
-                                                       return addCart(data);
+                                                       return await handleAddCart(
+                                                            record,
+                                                            data
+                                                       );
                                                   }}
                                              >
                                                   <Icon /> <span>{words}</span>

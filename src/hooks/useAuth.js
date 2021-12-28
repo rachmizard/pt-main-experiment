@@ -3,55 +3,56 @@ import { AuthContext } from "src/context/AuthContext";
 import { AuthService } from "src/services/auth.service";
 
 export default function useAuth() {
-  const authService = new AuthService();
+     const authService = new AuthService();
 
-  const auth = useContext(AuthContext);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+     const auth = useContext(AuthContext);
+     const [loading, setLoading] = useState(false);
+     const [error, setError] = useState(null);
 
-  const login = async ({ email = "", password = "" }) => {
-    try {
-      setLoading(true);
-      const { data } = await authService.login(email, password);
+     const login = async ({ email = "", password = "" }) => {
+          try {
+               setLoading(true);
+               const { data } = await authService.login(email, password);
 
-      auth.setAuth(data);
+               auth.setAuth(data);
 
-      localStorage.setItem("__auth__", JSON.stringify(data));
-    } catch (err) {
-      setError(err.message);
-      throw new Error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+               localStorage.setItem("__auth__", JSON.stringify(data));
+          } catch (err) {
+               setError(err.message);
+               throw new Error(err);
+          } finally {
+               setLoading(false);
+          }
+     };
 
-  const flushSyncProfile = async () => {
-    try {
-      const { data } = await authService.getProfile();
+     const flushSyncProfile = async () => {
+          try {
+               const { data } = await authService.getProfile();
 
-      auth.setAuth({ ...auth.auth, user: data.data });
+               auth.setAuth({ ...auth.auth, user: data.data });
 
-      localStorage.setItem(
-        "__auth__",
-        JSON.stringify({ ...auth.auth, user: data.data })
-      );
-    } catch (error) {
-      setError(error.message);
-      throw new Error(error);
-    }
-  };
+               localStorage.setItem(
+                    "__auth__",
+                    JSON.stringify({ ...auth.auth, user: data.data })
+               );
+          } catch (error) {
+               setError(error.message);
+               throw new Error(error);
+          }
+     };
 
-  const logout = () => {
-    localStorage.clear();
-    auth.setAuth(null);
-  };
+     const logout = () => {
+          localStorage.clear();
+          auth.setAuth(null);
+          window.location.reload();
+     };
 
-  return {
-    login,
-    logout,
-    loading,
-    error,
-    auth,
-    flushSyncProfile,
-  };
+     return {
+          login,
+          logout,
+          loading,
+          error,
+          auth,
+          flushSyncProfile,
+     };
 }
