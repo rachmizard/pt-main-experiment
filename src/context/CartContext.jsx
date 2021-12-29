@@ -7,9 +7,9 @@ const CartProvider = ({ children }) => {
 
      const [carts, setCarts] = useState(convertJson || []);
 
-     const value = useMemo(() => {
-          return { carts, setCarts };
-     }, [carts, setCarts]);
+     const [resource, setResource] = useState({});
+
+     const value = { carts, setCarts, resource, setResource };
 
      return (
           <CartContext.Provider value={value}>{children}</CartContext.Provider>

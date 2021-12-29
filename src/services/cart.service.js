@@ -23,7 +23,7 @@ export default class CartService extends AxiosAdapterService {
 
      async deleteCartByCourse(course) {
           try {
-               await this.sendDeleteRequest(`/client/cart/${course}`);
+               await this.sendDeleteRequest(`/client/cart/${course}/course`);
           } catch (error) {
                throw new Error(error);
           }

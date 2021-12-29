@@ -69,12 +69,6 @@ const CoursePage = () => {
                     bg: "warning",
                     message: error,
                });
-          } finally {
-               showPopup({
-                    show: true,
-                    bg: "success",
-                    message: `${record.courseTitle} successfully removed from your cart`,
-               });
           }
      };
 
