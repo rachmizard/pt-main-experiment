@@ -2,13 +2,18 @@ import React, { useEffect, useState } from "react";
 import { Col, Row, Button, Spinner, Form } from "react-bootstrap";
 import useCart from "src/hooks/useCart";
 import usePopup from "src/hooks/usePopup";
+import OrderService from "src/services/order.service";
+import { convertIDR } from "src/utils";
 
 const CartPage = () => {
+     const orderService = new OrderService();
+
      const { resource, isLoading, removeCart, refetch } = useCart();
      const [showPopup] = usePopup();
      const [totalPrice, setTotalPrice] = useState(0);
      const [selectedCart, setSelectedCart] = useState([]);
      const [checkedAll, setCheckedAll] = useState(false);
+     const [loadingPayment, setLoadingPayment] = useState(false);
 
      useEffect(() => {
           const sumPrice = [...selectedCart]
@@ -17,14 +22,6 @@ const CartPage = () => {
 
           setTotalPrice(sumPrice);
      }, [selectedCart, setSelectedCart]);
-
-     const converCurrency = (currency) => {
-          return new Intl.NumberFormat("id-ID", {
-               style: "currency",
-               currency: "IDR",
-               minimumFractionDigits: 2,
-          }).format(currency);
-     };
 
      const handleCheckAll = ({ target }) => {
           setCheckedAll(target.checked);
@@ -38,7 +35,7 @@ const CartPage = () => {
 
                setSelectedCart((state) => [
                     ...state,
-                    { id, price: course.price },
+                    { id, courseId: course?.id, price: course.price },
                ]);
           }
      };
@@ -54,7 +51,11 @@ const CartPage = () => {
 
           setSelectedCart((state) => [
                ...state,
-               { id: cart.id, price: cart?.course?.price },
+               {
+                    id: cart.id,
+                    courseId: cart?.course?.id,
+                    price: cart?.course?.price,
+               },
           ]);
      };
 
@@ -73,6 +74,25 @@ const CartPage = () => {
                });
           } finally {
                await refetch();
+          }
+     };
+
+     const handleContinuePayment = async () => {
+          try {
+               setLoadingPayment(true);
+               const courseIds = selectedCart.map((cart) => cart.courseId);
+
+               const response = await orderService.createOrder({ courseIds });
+
+               window.open(response?.paymentUrl, "_blank");
+          } catch (error) {
+               showPopup({
+                    show: true,
+                    bg: "warning",
+                    message: error.message,
+               });
+          } finally {
+               setLoadingPayment(false);
           }
      };
 
@@ -118,7 +138,7 @@ const CartPage = () => {
                                         />
                                    </Col>
                                    <Col>{course?.courseTitle}</Col>
-                                   <Col>{converCurrency(course?.price)}</Col>
+                                   <Col>{convertIDR(course?.price)}</Col>
                                    <Col>
                                         <Button
                                              variant="warning text-white"
@@ -146,7 +166,7 @@ const CartPage = () => {
                               <p>
                                    Total Checkout:{" "}
                                    <span className="fw-bold">
-                                        {converCurrency(totalPrice)}
+                                        {convertIDR(totalPrice)}
                                    </span>
                               </p>
                               <span>Selected: {selectedCart.length}</span>
@@ -154,8 +174,23 @@ const CartPage = () => {
                                    hidden={totalPrice === 0}
                                    variant="success"
                                    size="sm"
+                                   onClick={handleContinuePayment}
+                                   disabled={loadingPayment}
                               >
-                                   Continue Payment
+                                   {loadingPayment ? (
+                                        <>
+                                             <Spinner
+                                                  as="span"
+                                                  animation="grow"
+                                                  size="sm"
+                                                  role="status"
+                                                  aria-hidden="true"
+                                             />{" "}
+                                             Processing Payment...
+                                        </>
+                                   ) : (
+                                        "Continue Payment"
+                                   )}
                               </Button>
                          </div>
                     </Col>

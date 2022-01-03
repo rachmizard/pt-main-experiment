@@ -1,5 +1,5 @@
 import React from "react";
-import { Badge, Container, Navbar } from "react-bootstrap";
+import { Badge, Container, Navbar, NavDropdown } from "react-bootstrap";
 import { FaCartPlus } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import useAuth from "src/hooks/useAuth";
@@ -66,24 +66,38 @@ const NavHeader = ({ children }) => {
                                              {carts?.length}
                                         </Badge>
                                    </Navbar.Text>
-                                   <Navbar.Text className="p-3">
-                                        <a
-                                             href="#home"
+                                   <NavDropdown
+                                        title={auth?.auth?.user?.username}
+                                        id="basic-nav-dropdown"
+                                   >
+                                        <NavDropdown.Item
+                                             href="#action/3.1"
                                              onClick={handleRefreshAuth}
                                         >
-                                             {auth?.auth?.user?.username}
-                                        </a>
-                                   </Navbar.Text>
-                                   <Navbar.Text className="p-3">
-                                        <Link to="/courses">Course</Link>
-                                   </Navbar.Text>
-                                   <Navbar.Text
-                                        className="p-3"
-                                        style={{ cursor: "pointer" }}
-                                        onClick={handleLogout}
-                                   >
-                                        Logout
-                                   </Navbar.Text>
+                                             Profile
+                                        </NavDropdown.Item>
+                                        <NavDropdown.Item
+                                             as={Link}
+                                             to="/orders"
+                                             href="#action/3.2"
+                                        >
+                                             My Orders
+                                        </NavDropdown.Item>
+                                        <NavDropdown.Item
+                                             as={Link}
+                                             to="/courses"
+                                             href="#action/3.3"
+                                        >
+                                             Course
+                                        </NavDropdown.Item>
+                                        <NavDropdown.Divider />
+                                        <NavDropdown.Item
+                                             onClick={handleLogout}
+                                             href="#action/3.4"
+                                        >
+                                             Logout
+                                        </NavDropdown.Item>
+                                   </NavDropdown>
                               </Navbar.Collapse>
                          )}
                     </Container>

@@ -11,6 +11,7 @@ import CoursePage from "./pages/course";
 import CreateCoursePage from "./pages/course/create";
 import DetailCoursePage from "./pages/course/detail";
 import HomePage from "./pages/home";
+import OrderPage from "./pages/order";
 
 function App() {
      return (
@@ -36,6 +37,7 @@ function App() {
                               element={<CreateCoursePage />}
                          />
                          <Route path="/cart" element={<CartPage />} />
+                         <Route path="/orders" element={<OrderPage />} />
                     </Route>
                </Routes>
                <Popup />

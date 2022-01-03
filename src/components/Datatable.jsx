@@ -23,6 +23,8 @@ const Datatable = ({
      customPanel,
      defaultQuery,
      withSearch,
+     searchPlacholder = "Search...",
+     customFilterPlugin,
      paginate = {
           totalCount: 0,
           siblingCount: 1,
@@ -42,10 +44,8 @@ const Datatable = ({
      }, []);
 
      useEffect(() => {
-          if (query?.sortBy || query.limit || query.page) {
-               onSubmitFilter(query);
-          }
-     }, [query?.sortBy, query.limit, query.page]);
+          onSubmitFilter(query);
+     }, [query?.sortBy, query.limit, query.page, query]);
 
      const [sorts, setSorts] = useState([]);
 
@@ -94,10 +94,23 @@ const Datatable = ({
           setQuery((state) => ({ ...state, page }));
      };
 
+     const renderCustomFilterPlugins = () => {
+          return React.Children.map(customFilterPlugin, (child) => {
+               return React.cloneElement(child, {
+                    onChange: (e) => {
+                         setQuery((state) => ({
+                              ...state,
+                              [child.props?.name]: e.target.value,
+                         }));
+                    },
+               });
+          });
+     };
+
      return (
           <>
                <Row className="mb-3">
-                    <Col hidden={!withSearch}>
+                    <Col lg={4} hidden={!withSearch}>
                          <Form onSubmit={filterQuery}>
                               <Row>
                                    <Col>
@@ -110,7 +123,7 @@ const Datatable = ({
                                                        )
                                                   }
                                                   type="text"
-                                                  placeholder="Search Course..."
+                                                  placeholder={searchPlacholder}
                                              />
                                         </Form.Group>
                                    </Col>
@@ -127,6 +140,7 @@ const Datatable = ({
                               </Row>
                          </Form>
                     </Col>
+                    <Col>{renderCustomFilterPlugins()}</Col>
                     <Col className="align-self-end">{customPanel}</Col>
                </Row>
                <Table striped borderless size="md" hover variant="light">
